@@ -1,0 +1,67 @@
+---
+title: "HW6"
+author: "Yixianghuang"
+date: "2/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+Question1:
+How does k-means clustering select its clusters?
+
+--Answer:
+1.	At first, suppose K = 2, we randomly select two points in the sample, the Red-1 point and Blue-1 point
+2.	Then calculate the distance of all other points to these two points respectively and split the all other points into red and blue two clusters based on its shorter distance to these two points. 
+3.	Now, we finish the first round iteration. Then we find the central point of these two clusters, suppose as Red-2 and Blue-2, then repeat the step 2 to calculate the distance of other points to these two points and cluster them into two new clusters again. This is the second iteration
+4.	We repeat the iterations until all points are clustered to its shortest center point then finalize the clustering.
+
+Should we use AICc and BIC to select the value of K? Please explain your answer.
+
+--Anser:
+We can use AICc and BIC to select K. The df is K times P. But both AICc and BIC work bad to choose K, the results might even be wrong, If we use them to select K, the number would be very large like K = 50 or higher. Instead of AICc and BIC, we can use Elbow Rule or domain knowledge 
+
+
+
+
+Question2:
+Please explain how PCA reduces the number of variables?
+
+--Answer:PCA rotates the coordinate system in order to point the first dimension of the new coordinate system into the direction of the most variance and the second dimension pointing it to the direction of the most residual variance. PCA transforms correlated variables into a smaller number of uncorrelated variables. This is done by projecting the original data into the reduced PCA coordinates and the first component explains the most variance in the data with each subsequent component explaining less.
+```{r}
+library('pls')
+library('readxl')
+```
+
+Read Data:
+```{r}
+df <- read_xlsx('PCR_Data.xlsx')
+head(df)
+```
+Fit PCR model:
+```{r}
+set.seed(1)
+model <- pcr(hc~., data=df, scale=TRUE, validation="CV")
+summary(model)
+```
+Explanation:
+Because when we add the second component, the RMSE is the smallest 37.82, so the optimum number of components is 2
+
+
+
+Question3
+For each of the following trees, please explain how it is grown (i.e., how to select the variables to split on at each node)
+Answer:
+Classification Tree: Classification models that divide observations into groups based on their observed characteristics, the model select the feature at a specific value as the split node and split the all points into two groups that match the points' real label as much as possible. For example, for 10 students from Class A and  10 students Class B, there are some features among them, we select the height 5.5 as our split node, because 80% of students with the height below 5.5 are from Class A, 70% of students higher than 5.5 are from Class B and we can't find a better node to get a higher probability than node of 5.5 height. So 5.5 height becomes our first node, then in the second levels, among the students higher than 5.5, we select exam score 70 as second node then split the students two get the highest probability of right classificaition for Class A and Class B
+
+
+Regression Tree:Regression models that predict the value of a dependent variable. For example, the dependent variable is exam sore. We select the 4 hours of study per day as first node and divide students into two groups. In the first group, all students study over 4 hours per day, and we calculate the variance of their exam scores and plus the vairance of exam scores from second group where all students study less than 4 hours per day, then the sum of variance of two groups is the smaller than any other split node if we choose. so the 4 hours of study per day becomes the first node, and then we repeat the spliting in second round in each group to minimize the variance.
